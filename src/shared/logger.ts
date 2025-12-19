@@ -3,7 +3,7 @@ import * as util from 'util';
 import * as winston from 'winston';
 
 const ERROR_STASHES: string[] = [];
-let ERROR_SENDING_INTERVAL: number;
+let ERROR_SENDING_INTERVAL: numbers;
 if (process.env.ERROR_SENDING_INTERVAL) {
   ERROR_SENDING_INTERVAL = parseInt(process.env.ERROR_SENDING_INTERVAL, 10);
 }
