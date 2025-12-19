@@ -44,7 +44,7 @@ export function getLogger(name: string) {
             }`;
           }),
         ),
-        stderrLevels: ['errors'],
+        stderrLevels: ['error'],
       }),
     );
 
