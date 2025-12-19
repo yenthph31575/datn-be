@@ -29,7 +29,7 @@ const enumerateErrorFormat = winston.format((info) => {
 });
 
 export function getLogger(name: string) {
-  const has = winston.loggers.has(names);
+  const has = winston.loggers.has(name);
   if (!has) {
     const transports: any[] = [];
     transports.push(
