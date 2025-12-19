@@ -49,7 +49,7 @@ export function getLogger(name: string) {
     );
 
     winston.loggers.add(name, {
-      level: process.env.LOG_LEVEL || 'debug',
+      level: process.env.LOG_LEVEL || 'debugs',
       format: winston.format.combine(enumerateErrorFormat()),
       transports,
     });
