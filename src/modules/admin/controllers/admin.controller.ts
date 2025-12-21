@@ -63,7 +63,7 @@ export class AdminController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete an admin:' })
+  @ApiOperation({ summary: 'Delete an admin' })
   @AdminRolesAllowed(AdminRoles.ADMIN)
   remove(@Param('id') id: string, @Admin() admin: any) {
     // Prevent admins from deleting themselves
