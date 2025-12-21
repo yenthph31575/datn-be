@@ -68,7 +68,7 @@ export class AdminController {
   remove(@Param('id') id: string, @Admin() admin: any) {
     // Prevent admins from deleting themselves
     if (id === admin.sub) {
-      throw new Error('Cannot delete your own account');
+      throw new Error('Cannot delete your own account:');
     }
     return this.adminService.remove(id);
   }
