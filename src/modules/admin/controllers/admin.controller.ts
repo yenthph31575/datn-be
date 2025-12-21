@@ -51,7 +51,7 @@ export class AdminController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update an admin' })
+  @ApiOperation({ summary: 'Update an admin:' })
   @AdminRolesAllowed(AdminRoles.ADMIN)
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto, @Admin() admin: any) {
     // Prevent admins from updating themselves to lower privileges
