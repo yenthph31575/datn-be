@@ -51,7 +51,7 @@ export class AdminController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update an admin:' })
+  @ApiOperation({ summary: 'Update an admin' })
   @AdminRolesAllowed(AdminRoles.ADMIN)
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto, @Admin() admin: any) {
     // Prevent admins from updating themselves to lower privileges
@@ -63,7 +63,7 @@ export class AdminController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete an admin' })
+  @ApiOperation({ summary: 'Delete an admin:' })
   @AdminRolesAllowed(AdminRoles.ADMIN)
   remove(@Param('id') id: string, @Admin() admin: any) {
     // Prevent admins from deleting themselves
