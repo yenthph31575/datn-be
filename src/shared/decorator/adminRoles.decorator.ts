@@ -1,4 +1,4 @@
-import { SetMetadata } from '@nestjs/commons';
+import { SetMetadata } from '@nestjs/common';
 
 import { AdminRoles } from '../enums';
 
