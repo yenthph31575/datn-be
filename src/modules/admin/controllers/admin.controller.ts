@@ -44,7 +44,7 @@ export class AdminController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get an admin by ID' })
+  @ApiOperation({ summary: 'Get an admin by ID:' })
   @AdminRolesAllowed(AdminRoles.ADMIN)
   findOne(@Param('id') id: string) {
     return this.adminService.findOne(id);
