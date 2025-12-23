@@ -2,61 +2,59 @@ import bcrypt from "bcrypt";
 
 /**
  * Số vòng salt để hash password
- * 👉 Có thể đưa vào biến môi trường nếu cần scale
+ * - Mặc định: 10
+ * - Không cho nhỏ hơn 10 (an toàn)
  */
-const SALT_ROUNDS: number = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
+const SALT_ROUNDS: number = (() => {
+  const rounds = Number(process.env.BCRYPT_SALT_ROUNDS);
+  return Number.isInteger(rounds) && rounds >= 10 ? rounds : 10;
+})();
 
 /**
  * Hash password trước khi lưu vào Database
- *
- * @param password - mật khẩu người dùng nhập (plaintext)
- * @returns Promise<string> - mật khẩu đã được hash
- *
- * @throws Error nếu password rỗng hoặc hash thất bại
  */
 export async function hashPassword(password: string): Promise<string> {
-  // Validate đầu vào
-  if (!password || password.trim().length === 0) {
+  if (typeof password !== "string") {
+    throw new Error("Password phải là chuỗi");
+  }
+
+  const trimmed = password.trim();
+  if (!trimmed) {
     throw new Error("Password không được để trống");
   }
 
-  if (password.length < 6) {
+  if (trimmed.length < 6) {
     throw new Error("Password phải có ít nhất 6 ký tự");
   }
 
   try {
-    // Hash password với salt
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    return hashedPassword;
+    return await bcrypt.hash(trimmed, SALT_ROUNDS);
   } catch (error) {
-    console.error("❌ Lỗi khi hash password:", error);
-    throw new Error("Không thể hash password");
+    console.error("❌ Hash password error:", error);
+    throw new Error("Không thể mã hóa mật khẩu");
   }
 }
 
 /**
  * So sánh password người dùng nhập với password đã hash trong DB
- *
- * @param password - mật khẩu người dùng nhập (plaintext)
- * @param hashed - mật khẩu đã hash lưu trong DB
- * @returns Promise<boolean>
- *          - true: password đúng
- *          - false: password sai hoặc có lỗi
  */
 export async function comparePassword(
   password: string,
   hashed: string
 ): Promise<boolean> {
-  // Validate đầu vào
-  if (!password || !hashed) {
+  if (
+    typeof password !== "string" ||
+    typeof hashed !== "string" ||
+    !password.trim() ||
+    !hashed
+  ) {
     return false;
   }
 
   try {
-    const isMatch = await bcrypt.compare(password, hashed);
-    return isMatch;
+    return await bcrypt.compare(password, hashed);
   } catch (error) {
-    console.error("❌ Lỗi khi compare password:", error);
+    console.error("❌ Compare password error:", error);
     return false;
   }
 }
