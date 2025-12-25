@@ -20,7 +20,7 @@ export class AdminService {
     });
 
     if (existingAdmin) {
-      throw new BadRequestException('Email or username already exist');
+      throw new BadRequestException('Email or username already exists');
     }
 
     // Hash password
