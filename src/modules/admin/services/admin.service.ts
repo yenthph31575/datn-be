@@ -67,7 +67,7 @@ export class AdminService {
 
   async findOne(id: string) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException('Invalid admin I');
+      throw new BadRequestException('Invalid admin ID');
     }
 
     const admin = await this.adminModel.findById(id).select('-password');
