@@ -5,8 +5,8 @@ import bcrypt from "bcrypt";
  * ========================= */
 
 /**
- * Số vòng salt để hash password
- * - Lấy từ ENV nếu hợp lệ
+ * Salt rounds để hash password
+ * - Ưu tiên ENV
  * - Tối thiểu: 10
  * - Mặc định: 10
  */
@@ -20,18 +20,36 @@ const SALT_ROUNDS: number = (() => {
  * ========================= */
 
 /**
- * Chuẩn hóa & validate password input
+ * Validate password khi HASH (nghiêm ngặt)
+ */
+function validatePasswordForHash(password: unknown): string {
+  if (typeof password !== "string") {
+    throw new Error("Password phải là chuỗi");
+  }
+
+  const value = password.trim();
+
+  if (!value) {
+    throw new Error("Password không được để trống");
+  }
+
+  if (value.length < 6 || value.length > 128) {
+    throw new Error("Password phải từ 6 đến 128 ký tự");
+  }
+
+  return value;
+}
+
+/**
+ * Normalize password khi COMPARE (nhẹ)
  */
 function normalizePassword(password: unknown): string | null {
   if (typeof password !== "string") return null;
 
-  const trimmed = password.trim();
+  const value = password.trim();
+  if (!value) return null;
 
-  if (!trimmed) return null;
-  if (trimmed.length < 6) return null;
-  if (trimmed.length > 128) return null;
-
-  return trimmed;
+  return value;
 }
 
 /* =========================
@@ -39,17 +57,13 @@ function normalizePassword(password: unknown): string | null {
  * ========================= */
 
 export async function hashPassword(password: unknown): Promise<string> {
-  const validPassword = normalizePassword(password);
-
-  if (!validPassword) {
-    throw new Error("Password không hợp lệ");
-  }
+  const validPassword = validatePasswordForHash(password);
 
   try {
-    return bcrypt.hash(validPassword, SALT_ROUNDS);
+    return await bcrypt.hash(validPassword, SALT_ROUNDS);
   } catch (error) {
     console.error("[bcrypt] hash error:", error);
-    throw new Error("Không thể mã hóa mật khẩu");
+    throw new Error("Không thể hash password");
   }
 }
 
@@ -61,17 +75,17 @@ export async function comparePassword(
   password: unknown,
   hashed: unknown
 ): Promise<boolean> {
-  if (typeof hashed !== "string" || hashed.length === 0) {
+  if (typeof hashed !== "string" || !hashed) {
     return false;
   }
 
-  const validPassword = normalizePassword(password);
-  if (!validPassword) {
+  const normalized = normalizePassword(password);
+  if (!normalized) {
     return false;
   }
 
   try {
-    return bcrypt.compare(validPassword, hashed);
+    return await bcrypt.compare(normalized, hashed);
   } catch (error) {
     console.error("[bcrypt] compare error:", error);
     return false;
