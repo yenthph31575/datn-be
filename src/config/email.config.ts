@@ -13,6 +13,7 @@ export interface EmailConfig {
   appName: string;
 }
 
+// Email configuration (no logic change)
 export default registerAs(EmailConfigName, () => ({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT || '587'),
