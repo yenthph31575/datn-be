@@ -1,19 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  UseGuards,
-  HttpCode,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, UseGuards, HttpCode, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { GoogleAuthService } from './google-auth.service';
@@ -21,7 +7,6 @@ import { AuthGuard } from './guards/auth.guard';
 
 import { CreateAuthDto, SignInDto } from './dto/create-auth.dto';
 import { ForgotPasswordDto, ResetPasswordDto } from './dto/forgot-password.dto';
-import { GoogleAuthDto } from './dto/google-auth.dto';
 
 import { User } from '@/shared/decorator/user.decorator';
 
@@ -38,8 +23,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Authenticate with Google' })
   @ApiResponse({ status: 200, description: 'Authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid Google token' })
-  async googleAuth(@Body() dto: GoogleAuthDto) {
-    const googleData = await this.googleAuthService.verify(dto.token);
+  async googleAuth(@Body('token') token: string) {
+    const googleData = await this.googleAuthService.verify(token);
     return this.authService.handleGoogleAuth(googleData);
   }
 

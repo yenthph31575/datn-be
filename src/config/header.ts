@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 
 /**
  * =========================
@@ -27,7 +27,7 @@ const SALT_ROUNDS = (() => {
  * Chuẩn hóa password input
  */
 function normalizePassword(password: unknown): string | null {
-  if (typeof password !== "string") return null;
+  if (typeof password !== 'string') return null;
 
   const trimmed = password.trim();
   if (!trimmed) return null;
@@ -46,14 +46,14 @@ export async function hashPassword(password: unknown): Promise<string> {
   const validPassword = normalizePassword(password);
 
   if (!validPassword) {
-    throw new Error("Password không hợp lệ");
+    throw new Error('Password không hợp lệ');
   }
 
   try {
     return await bcrypt.hash(validPassword, SALT_ROUNDS);
   } catch (err) {
-    console.error("Hash password error:", err);
-    throw new Error("Không thể mã hóa mật khẩu");
+    console.error('Hash password error:', err);
+    throw new Error('Không thể mã hóa mật khẩu');
   }
 }
 
@@ -63,11 +63,8 @@ export async function hashPassword(password: unknown): Promise<string> {
  * =========================
  */
 
-export async function comparePassword(
-  password: unknown,
-  hashed: unknown
-): Promise<boolean> {
-  if (typeof hashed !== "string" || !hashed) {
+export async function comparePassword(password: unknown, hashed: unknown): Promise<boolean> {
+  if (typeof hashed !== 'string' || !hashed) {
     return false;
   }
 
@@ -79,7 +76,7 @@ export async function comparePassword(
   try {
     return await bcrypt.compare(validPassword, hashed);
   } catch (err) {
-    console.error("Compare password error:", err);
+    console.error('Compare password error:', err);
     return false;
   }
 }

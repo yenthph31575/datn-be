@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 
 /* =========================
  * CONFIG
@@ -23,18 +23,18 @@ const SALT_ROUNDS: number = (() => {
  * Validate password khi HASH (nghiêm ngặt)
  */
 function validatePasswordForHash(password: unknown): string {
-  if (typeof password !== "string") {
-    throw new Error("Password phải là chuỗi");
+  if (typeof password !== 'string') {
+    throw new Error('Password phải là chuỗi');
   }
 
   const value = password.trim();
 
   if (!value) {
-    throw new Error("Password không được để trống");
+    throw new Error('Password không được để trống');
   }
 
   if (value.length < 6 || value.length > 128) {
-    throw new Error("Password phải từ 6 đến 128 ký tự");
+    throw new Error('Password phải từ 6 đến 128 ký tự');
   }
 
   return value;
@@ -44,7 +44,7 @@ function validatePasswordForHash(password: unknown): string {
  * Normalize password khi COMPARE (nhẹ)
  */
 function normalizePassword(password: unknown): string | null {
-  if (typeof password !== "string") return null;
+  if (typeof password !== 'string') return null;
 
   const value = password.trim();
   if (!value) return null;
@@ -62,8 +62,8 @@ export async function hashPassword(password: unknown): Promise<string> {
   try {
     return await bcrypt.hash(validPassword, SALT_ROUNDS);
   } catch (error) {
-    console.error("[bcrypt] hash error:", error);
-    throw new Error("Không thể hash password");
+    console.error('[bcrypt] hash error:', error);
+    throw new Error('Không thể hash password');
   }
 }
 
@@ -71,11 +71,8 @@ export async function hashPassword(password: unknown): Promise<string> {
  * COMPARE PASSWORD
  * ========================= */
 
-export async function comparePassword(
-  password: unknown,
-  hashed: unknown
-): Promise<boolean> {
-  if (typeof hashed !== "string" || !hashed) {
+export async function comparePassword(password: unknown, hashed: unknown): Promise<boolean> {
+  if (typeof hashed !== 'string' || !hashed) {
     return false;
   }
 
@@ -87,7 +84,7 @@ export async function comparePassword(
   try {
     return await bcrypt.compare(normalized, hashed);
   } catch (error) {
-    console.error("[bcrypt] compare error:", error);
+    console.error('[bcrypt] compare error:', error);
     return false;
   }
 }
