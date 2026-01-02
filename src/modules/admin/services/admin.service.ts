@@ -20,7 +20,7 @@ export class AdminService {
     });
 
     if (existingAdmin) {
-      throw new BadRequestException('Email or username already exists');
+      throw new BadRequestException('Email hoặc username đã tồn tại');
     }
 
     // Hash password
@@ -67,13 +67,13 @@ export class AdminService {
 
   async findOne(id: string) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException('Invalid admin ID');
+      throw new BadRequestException('ID admin không hợp lệ');
     }
 
     const admin = await this.adminModel.findById(id).select('-password');
 
     if (!admin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException('Không tìm thấy admin');
     }
 
     return admin;
@@ -81,7 +81,7 @@ export class AdminService {
 
   async update(id: string, updateAdminDto: UpdateAdminDto) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException('Invalid admin ID');
+      throw new BadRequestException('ID admin không hợp lệ');
     }
 
     // If password is provided, hash it
@@ -92,7 +92,7 @@ export class AdminService {
     const updatedAdmin = await this.adminModel.findByIdAndUpdate(id, updateAdminDto, { new: true }).select('-password');
 
     if (!updatedAdmin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException('Không tìm thấy admin');
     }
 
     return updatedAdmin;
@@ -100,13 +100,13 @@ export class AdminService {
 
   async remove(id: string) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException('Invalid admin ID');
+      throw new BadRequestException('ID admin không hợp lệ');
     }
 
     const deletedAdmin = await this.adminModel.findByIdAndDelete(id);
 
     if (!deletedAdmin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException('Không tìm thấy admin');
     }
 
     return { success: true, message: 'Admin deleted successfully' };
@@ -114,7 +114,7 @@ export class AdminService {
 
   async changeStatus(id: string, status: AdminStatus) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException('Invalid admin ID');
+      throw new BadRequestException('ID admin không hợp lệ');
     }
 
     const isActive = status === AdminStatus.ACTIVE;
@@ -122,7 +122,7 @@ export class AdminService {
     const updatedAdmin = await this.adminModel.findByIdAndUpdate(id, { isActive }, { new: true }).select('-password');
 
     if (!updatedAdmin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException('Không tìm thấy admin');
     }
 
     return updatedAdmin;
