@@ -64,6 +64,9 @@ export class AdminAuthController {
   async getProfile(@Admin() admin: any) {
     return this.adminAuthService.getProfile(admin.sub);
   }
+  async getProfile(@Admin() admin: any) {
+    return this.adminAuthService.getProfile(admin.sub);
+  }
 
   @Post('/create-admin')
   // @UseGuards(AdminAuthGuard)
