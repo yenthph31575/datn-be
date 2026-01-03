@@ -29,7 +29,6 @@ export class BannerAdminController {
   @ApiQuery({ name: 'type', required: false, enum: BannerType })
   @ApiQuery({ name: 'isActive', required: false, type: Boolean })
   findAll(
-    @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('type') type?: BannerType,
     @Query('isActive') isActive?: boolean,
