@@ -14,7 +14,9 @@ export function now(): number {
   return nowInMillis();
 }
 
-
+export function nowInSeconds(): number {
+  return (nowInMillis() / 1000) | 0;
+}
 
 export function addHttps(url: string) {
   if (!/^(?:f|ht)tps?\/\//.test(url)) {
