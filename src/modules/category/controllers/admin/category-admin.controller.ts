@@ -31,6 +31,11 @@ export class CategoryAdminController {
   findOne(@Param('id') id: string) {
     return this.categoryService.findOne(id);
   }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get category by id' })
+  findOne(@Param('id') id: string) {
+    return this.categoryService.findOne(id);
+  }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update category' })
