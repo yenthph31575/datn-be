@@ -24,12 +24,6 @@ export function addHttps(url: string) {
   }
   return url;
 }
-export function addHttps(url: string) {
-  if (!/^(?:f|ht)tps?\/\//.test(url)) {
-    url = 'https://' + url;
-  }
-  return url;
-}
 
 export function checkIPaginationOptions(options: IPaginationOptions): boolean {
   if (options.limit == 0 || options.page == 0) {
