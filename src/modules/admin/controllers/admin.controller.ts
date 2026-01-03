@@ -39,7 +39,7 @@ export class AdminController {
       page,
       limit,
       search,
-      
+      status,
     });
   }
 
