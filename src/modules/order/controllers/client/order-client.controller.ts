@@ -51,6 +51,12 @@ export class OrderClientController {
   @ApiQuery({ name: 'paymentStatus', required: false, enum: Object.values(PaymentStatus) })
   @ApiQuery({ name: 'shippingStatus', required: false, enum: Object.values(ShippingStatus) })
   @ApiQuery({ name: 'returnStatus', required: false, enum: Object.values(OrderReturnStatus) })
+  @ApiQuery({
+    name: 'isReturn',
+    required: false,
+    type: Boolean,
+    description: 'Filter orders with return/exchange requests',
+  })
   findAll(
     @Request() req,
     @Query('page') page: number = 1,
@@ -58,6 +64,7 @@ export class OrderClientController {
     @Query('paymentStatus') paymentStatus?: string,
     @Query('shippingStatus') shippingStatus?: string,
     @Query('returnStatus') returnStatus?: string,
+    @Query('isReturn') isReturn?: boolean,
   ) {
     return this.orderService.findUserOrders(req.user.sub, {
       page,
@@ -65,6 +72,7 @@ export class OrderClientController {
       paymentStatus,
       shippingStatus,
       returnStatus,
+      isReturn,
     });
   }
 

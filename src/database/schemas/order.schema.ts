@@ -119,11 +119,10 @@ export class Order {
 
   //
   @Prop({
-    type: String,
-    enum: OrderReturnStatus,
-    default: OrderReturnStatus.NONE,
+    type: Boolean,
+    default: false,
   })
-  returnStatus: OrderReturnStatus;
+  isReturn: boolean;
 
   @Prop({
     type: String,
@@ -138,6 +137,18 @@ export class Order {
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
+
+// Virtual populate for return request
+OrderSchema.virtual('returnRequest', {
+  ref: 'ReturnRequest',
+  localField: '_id',
+  foreignField: 'orderId',
+  justOne: true,
+});
+
+// Ensure virtuals are included in toJSON and toObject
+OrderSchema.set('toJSON', { virtuals: true });
+OrderSchema.set('toObject', { virtuals: true });
 
 // Generate unique order number
 OrderSchema.pre('save', function (next) {

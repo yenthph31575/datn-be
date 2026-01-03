@@ -127,18 +127,8 @@ export class ReturnRequestService {
         await this.updateOrderItemsStatus(order, request.items, OrderItemStatus.EXCHANGED);
 
         // Create New Exchange Order
-        if (request.exchangeItems && request.exchangeItems.length > 0) {
-          const newOrder = await this.orderService.createExchangeOrder(
-            order._id.toString(),
-            request.userId.toString(),
-            // Map to expected format
-            request.exchangeItems.map((i) => ({
-              productId: i.productId.toString(),
-              variantId: i.variantId?.toString(),
-              quantity: i.quantity,
-            })),
-            order.shippingAddress,
-          );
+        if (request.items && request.items.length > 0) {
+          const newOrder = await this.orderService.createExchangeOrder(order);
 
           request.exchangeOrderId = (newOrder as any)._id;
         }
@@ -175,7 +165,7 @@ export class ReturnRequestService {
     }
 
     if (updated) {
-      await this.orderModel.updateOne({ _id: order._id }, { items: orderItems });
+      await this.orderModel.updateOne({ _id: order._id }, { items: orderItems, isReturn: true });
     }
   }
 }

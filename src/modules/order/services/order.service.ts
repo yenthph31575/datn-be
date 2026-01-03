@@ -24,6 +24,7 @@ import { VoucherService } from '@/modules/voucher/services/voucher.service';
 import { Voucher, VoucherDocument } from '@/database/schemas/voucher.schema';
 import { ProductService } from '@/modules/product/services/product.service';
 import { ProductReview, ProductReviewDocument } from '@/database/schemas/product-review.schema';
+import { ReturnRequest } from '@/database/schemas/return-request.schema';
 
 interface OrderWithPayment extends Order {
   paymentSession?: any;
@@ -43,6 +44,7 @@ export class OrderService {
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(Voucher.name) private voucherModel: Model<VoucherDocument>,
     @InjectModel(ProductReview.name) private reviewModel: Model<ProductReviewDocument>,
+    @InjectModel(ReturnRequest.name) private returnRequestModel: Model<ReturnRequest>,
     private paymentService: PaymentService,
     private voucherService: VoucherService,
     private productService: ProductService,
@@ -265,12 +267,14 @@ export class OrderService {
     }
   }
 
-  async createExchangeOrder(
-    originalOrderId: string,
-    userId: string,
-    items: { productId: string; variantId?: string; quantity: number }[],
-    shippingAddress: any,
-  ): Promise<Order> {
+  async createExchangeOrder(originalOrder: Order): Promise<Order> {
+    // Extract items from original order
+    const items = originalOrder.items.map((item) => ({
+      productId: item.productId.toString(),
+      variantId: item.variantId?.toString(),
+      quantity: item.quantity,
+    }));
+
     // Validate products and prepare order items
     const orderItems = await Promise.all(
       items.map(async (item) => {
@@ -312,16 +316,16 @@ export class OrderService {
     const orderCode = `EXCH-${timestamp}${random}`;
 
     const order = new this.orderModel({
-      userId: new Types.ObjectId(userId),
+      userId: originalOrder.userId,
       items: orderItems,
       paymentMethod: PAYMENT_METHOD.CASH_ON_DELIVERY, // Shipping fee
       orderCode,
-      shippingAddress,
+      shippingAddress: originalOrder.shippingAddress,
       paymentStatus: PaymentStatus.PENDING,
       shippingStatus: ShippingStatus.PENDING,
       totalAmount: 0, // Only shipping fee (handled by shipping integration usually, or assumed flat rate/COD)
       discountAmount: 0,
-      returnStatus: OrderReturnStatus.NONE,
+      isReturn: false,
       orderType: orderType.EXCHANGE,
     });
 
@@ -354,9 +358,10 @@ export class OrderService {
       paymentStatus?: string;
       shippingStatus?: string;
       returnStatus?: string;
+      isReturn?: boolean;
     },
   ): Promise<any> {
-    const { page = 1, limit = 10, paymentStatus, shippingStatus, returnStatus } = options;
+    const { page = 1, limit = 10, paymentStatus, shippingStatus, returnStatus, isReturn } = options;
     const skip = (page - 1) * limit;
 
     const query: any = { userId: new Types.ObjectId(userId) };
@@ -373,10 +378,42 @@ export class OrderService {
       query.returnStatus = returnStatus;
     }
 
+    // Filter orders with return requests
+    if (isReturn !== undefined) {
+      const shouldFilterReturn = isReturn === true || isReturn === ('true' as any);
+
+      if (shouldFilterReturn) {
+        // Get order IDs that have return requests
+        const returnRequestOrderIds = await this.returnRequestModel.find({}).distinct('orderId');
+
+        query._id = { $in: returnRequestOrderIds };
+      } else {
+        // Get order IDs that DON'T have return requests
+        const returnRequestOrderIds = await this.returnRequestModel.find({}).distinct('orderId');
+
+        query._id = { $nin: returnRequestOrderIds };
+      }
+    }
+
     const [orders, total] = await Promise.all([
       this.orderModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
       this.orderModel.countDocuments(query),
     ]);
+
+    // Manually fetch return requests for these orders
+    const orderIds = orders.map((order) => order._id);
+    const returnRequests = await this.returnRequestModel
+      .find({
+        orderId: { $in: orderIds },
+      })
+      .select('orderId type status reason createdAt exchangeOrderId')
+      .lean();
+
+    // Create a map of orderId -> returnRequest
+    const returnRequestMap = new Map();
+    returnRequests.forEach((req: any) => {
+      returnRequestMap.set(req.orderId.toString(), req);
+    });
 
     const productIds = orders.flatMap((order) => order.items.map((item) => item.productId));
 
@@ -410,6 +447,9 @@ export class OrderService {
     const enrichedOrders = orders.map((order) => {
       const orderObj = order.toObject ? order.toObject() : order;
 
+      // Attach return request if exists
+      const returnRequest = returnRequestMap.get(orderObj._id.toString());
+
       const enrichedItems = orderObj.items.map((item) => {
         const productInfo = productMap.get(item.productId.toString());
 
@@ -440,6 +480,7 @@ export class OrderService {
       return {
         ...orderObj,
         items: enrichedItems,
+        returnRequest: returnRequest || null,
       };
     });
 
@@ -463,6 +504,12 @@ export class OrderService {
     if (!order) {
       throw new NotFoundException('Order not found');
     }
+
+    // Fetch return request for this order
+    const returnRequest = await this.returnRequestModel
+      .findOne({ orderId: order._id })
+      .select('type status reason description createdAt exchangeOrderId')
+      .lean();
 
     // Get product IDs from order items
     const productIds = order.items.map((item) => item.productId);
@@ -532,6 +579,7 @@ export class OrderService {
     return {
       ...orderObj,
       items: enrichedItems,
+      returnRequest: returnRequest || null,
     };
   }
 

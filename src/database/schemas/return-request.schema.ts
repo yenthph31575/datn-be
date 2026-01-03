@@ -16,7 +16,7 @@ export class ReturnItem {
 
 const ReturnItemSchema = SchemaFactory.createForClass(ReturnItem);
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, collection: 'return_requests' })
 export class ReturnRequest extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Order', required: true })
   orderId: Types.ObjectId;
@@ -49,9 +49,6 @@ export class ReturnRequest extends Document {
 
   @Prop({ type: [ReturnItemSchema], required: true })
   items: ReturnItem[];
-
-  @Prop({ type: [ReturnItemSchema], default: [] })
-  exchangeItems: ReturnItem[];
 
   @Prop({ type: Types.ObjectId, ref: 'Order', default: null })
   exchangeOrderId: Types.ObjectId;
