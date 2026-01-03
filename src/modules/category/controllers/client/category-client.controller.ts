@@ -29,7 +29,6 @@ export class CategoryClientController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('sort') sort?: string,
-    @Query('order') order?: 'asc' | 'desc',
   ) {
     return this.categoryService.findProducts(id, { page, limit, sort, order });
   }
