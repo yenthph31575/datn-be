@@ -508,7 +508,7 @@ export class OrderService {
     // Fetch return request for this order
     const returnRequest = await this.returnRequestModel
       .findOne({ orderId: order._id })
-      .select('type status reason description createdAt exchangeOrderId email')
+      .select('type status reason description createdAt exchangeOrderId email refundInfo')
       .lean();
 
     // Get product IDs from order items

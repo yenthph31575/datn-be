@@ -63,12 +63,22 @@ export class ReturnRequestService {
   }
 
   async findAllJson(query: any) {
-    const { page = 1, limit = 10, status, type } = query;
+    const { page = 1, limit = 10, status, type, search } = query;
     const skip = (page - 1) * limit;
 
     const filter: any = {};
     if (status) filter.status = status;
     if (type) filter.type = type;
+
+    // If search is provided, find matching orders by order code
+    if (search) {
+      const orders = await this.orderModel
+        .find({ orderCode: { $regex: search, $options: 'i' } })
+        .select('_id');
+      
+      const orderIds = orders.map(order => order._id);
+      filter.orderId = { $in: orderIds };
+    }
 
     const [items, total] = await Promise.all([
       this.returnRequestModel

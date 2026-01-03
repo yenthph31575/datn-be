@@ -15,6 +15,7 @@ export class ReturnRequestAdminController {
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'status', required: false })
   @ApiQuery({ name: 'type', required: false })
+  @ApiQuery({ name: 'search', required: false, description: 'Search by order code' })
   findAll(@Query() query) {
     return this.returnRequestService.findAllJson(query);
   }
