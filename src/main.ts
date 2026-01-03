@@ -29,18 +29,6 @@ async function bootstrap() {
   await app.listen(port, () => {
     debugLog(`The server ${process.env.NODE_ENV} is running on: ${port}`);
   });
-  const config = new DocumentBuilder()
-    .setTitle('Kiddie Kingdom')
-    .setDescription('The kiddie kingdom API description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, documentFactory);
-
-  app.setGlobalPrefix('api');
-  await app.listen(port, () => {
-    debugLog(`The server ${process.env.NODE_ENV} is running on: ${port}`);
-  });
+  
 }
 bootstrap();
