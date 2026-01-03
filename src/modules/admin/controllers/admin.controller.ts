@@ -41,12 +41,6 @@ export class AdminController {
       search,
       status,
     });
-    return this.adminService.findAll({
-      page,
-      limit,
-      search,
-      status,
-    });
   }
 
   @Get(':id')
