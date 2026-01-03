@@ -40,12 +40,7 @@ export class BannerAdminController {
       type,
       isActive,
     });
-    return this.bannerService.findAll({
-      page,
-      limit,
-      type,
-      isActive,
-    });
+    
   }
 
   @Get(':id')
