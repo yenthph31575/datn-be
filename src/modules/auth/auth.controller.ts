@@ -27,10 +27,7 @@ import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 
 import { User } from '@/shared/decorator/user.decorator';
-
-interface JwtPayload {
-  sub: string;
-}
+import { JwtPayload } from '@/shared/types/jwt-payload.type';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -46,16 +43,16 @@ export class AuthController {
   @ApiOperation({ summary: 'Authenticate with Google' })
   @ApiResponse({ status: 200, description: 'Authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid Google token' })
-  async googleAuth(@Body() dto: GoogleAuthDto) {
-    const googleData = await this.googleAuthService.verify(dto.token);
-    return this.authService.handleGoogleAuth(googleData);
+  googleAuth(@Body() dto: GoogleAuthDto) {
+    return this.authService.googleLogin(dto.token);
   }
 
   // ========================= SIGN UP =========================
   @Post('sign-up')
   @HttpCode(201)
   @ApiOperation({ summary: 'Register new user' })
-  @ApiResponse({ status: 201 })
+  @ApiResponse({ status: 201, description: 'User created' })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
   signup(@Body() dto: CreateAuthDto) {
     return this.authService.signup(dto);
   }
@@ -65,6 +62,7 @@ export class AuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
   signin(@Body() dto: SignInDto) {
     return this.authService.signin(dto);
   }
@@ -84,6 +82,7 @@ export class AuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Verify email address' })
   @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   verifyEmail(@Body() dto: VerifyEmailDto) {
     return this.authService.verifyEmail(dto.token);
   }
