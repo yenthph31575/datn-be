@@ -1,38 +1,21 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  UseGuards,
-  HttpCode,
-  Req,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiBody,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, UseGuards, HttpCode, Req, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiQuery } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guards/auth.guard';
 
 import { CreateAuthDto, SignInDto } from './dto/create-auth.dto';
-import {
-  ForgotPasswordDto,
-  ResetPasswordDto,
-} from './dto/forgot-password.dto';
+import { ForgotPasswordDto, ResetPasswordDto } from './dto/forgot-password.dto';
 import { GoogleAuthService } from './google-auth.service';
 import { User } from '@/shared/decorator/user.decorator';
-
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly googleAuthService: GoogleAuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly googleAuthService: GoogleAuthService,
+  ) {}
 
   // ========================= GOOGLE AUTH =========================
   @Post('google')
@@ -41,7 +24,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid Google token' })
   async googleAuth(@Body('token') token: string) {
-     const googleData = await this.googleAuthService.verify(token);
+    const googleData = await this.googleAuthService.verify(token);
     return this.authService.handleGoogleAuth(googleData);
   }
 
@@ -78,7 +61,7 @@ export class AuthController {
   }
 
   // ========================= VERIFY EMAIL =========================
-    @Post('verify-email')
+  @Post('verify-email')
   @ApiOperation({ summary: 'Verify email address' })
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired verification token' })
