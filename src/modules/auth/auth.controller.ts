@@ -13,6 +13,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
@@ -38,6 +39,7 @@ export class AuthController {
   @Post('google')
   @HttpCode(200)
   @ApiOperation({ summary: 'Authenticate with Google' })
+  @ApiBody({ type: GoogleAuthDto })
   @ApiResponse({ status: 200, description: 'Authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid Google token' })
   async googleAuth(@Body() dto: GoogleAuthDto) {
@@ -48,6 +50,7 @@ export class AuthController {
   // ========================= SIGN UP =========================
   @Post('sign-up')
   @ApiOperation({ summary: 'Register new user' })
+  @ApiBody({ type: CreateAuthDto })
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
   signup(@Body() dto: CreateAuthDto) {
@@ -58,6 +61,7 @@ export class AuthController {
   @Post('sign-in')
   @HttpCode(200)
   @ApiOperation({ summary: 'Login user' })
+  @ApiBody({ type: SignInDto })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   signin(@Body() dto: SignInDto) {
@@ -93,6 +97,7 @@ export class AuthController {
   @Post('resend-verification')
   @HttpCode(200)
   @ApiOperation({ summary: 'Resend verification email' })
+  @ApiBody({ type: ResendVerificationDto })
   @ApiResponse({ status: 200, description: 'Email sent' })
   @ApiResponse({ status: 400, description: 'Email already verified' })
   resendVerification(@Body() dto: ResendVerificationDto) {
@@ -103,6 +108,7 @@ export class AuthController {
   @Post('forgot-password')
   @HttpCode(200)
   @ApiOperation({ summary: 'Request password reset' })
+  @ApiBody({ type: ForgotPasswordDto })
   @ApiResponse({ status: 200, description: 'Reset email sent' })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto.email);
@@ -112,6 +118,7 @@ export class AuthController {
   @Post('reset-password')
   @HttpCode(200)
   @ApiOperation({ summary: 'Reset password' })
+  @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   resetPassword(@Body() dto: ResetPasswordDto) {
