@@ -32,6 +32,7 @@ export class BannerAdminController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('type') type?: BannerType,
+    @Query('isActive') isActive?: boolean,
   ) {
     return this.bannerService.findAll({
       page,
