@@ -5,14 +5,12 @@ import {
   Body,
   UseGuards,
   HttpCode,
-  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
 
@@ -49,10 +47,9 @@ export class AuthController {
 
   // ========================= SIGN UP =========================
   @Post('sign-up')
+  @HttpCode(201)
   @ApiOperation({ summary: 'Register new user' })
   @ApiBody({ type: CreateAuthDto })
-  @ApiResponse({ status: 201, description: 'User created successfully' })
-  @ApiResponse({ status: 409, description: 'Email already exists' })
   signup(@Body() dto: CreateAuthDto) {
     return this.authService.signup(dto);
   }
@@ -62,8 +59,6 @@ export class AuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Login user' })
   @ApiBody({ type: SignInDto })
-  @ApiResponse({ status: 200, description: 'Login successful' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
   signin(@Body() dto: SignInDto) {
     return this.authService.signin(dto);
   }
@@ -73,23 +68,24 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, description: 'User profile returned' })
   getProfile(@User() user: { sub: string }) {
     return this.authService.getProfile(user.sub);
   }
 
   // ========================= VERIFY EMAIL =========================
-  @Get('verify-email')
+  @Post('verify-email')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Verify email address' })
-  @ApiQuery({
-    name: 'token',
-    type: String,
-    required: true,
-    description: 'Email verification token',
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        token: { type: 'string', example: 'verify-token' },
+      },
+      required: ['token'],
+    },
   })
-  @ApiResponse({ status: 200, description: 'Email verified' })
-  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  verifyEmail(@Query('token') token: string) {
+  verifyEmail(@Body('token') token: string) {
     return this.authService.verifyEmail(token);
   }
 
@@ -98,8 +94,6 @@ export class AuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Resend verification email' })
   @ApiBody({ type: ResendVerificationDto })
-  @ApiResponse({ status: 200, description: 'Email sent' })
-  @ApiResponse({ status: 400, description: 'Email already verified' })
   resendVerification(@Body() dto: ResendVerificationDto) {
     return this.authService.resendVerificationEmail(dto.email);
   }
@@ -109,7 +103,6 @@ export class AuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Request password reset' })
   @ApiBody({ type: ForgotPasswordDto })
-  @ApiResponse({ status: 200, description: 'Reset email sent' })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto.email);
   }
@@ -119,8 +112,6 @@ export class AuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Reset password' })
   @ApiBody({ type: ResetPasswordDto })
-  @ApiResponse({ status: 200, description: 'Password reset successful' })
-  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto.token, dto.newPassword);
   }
