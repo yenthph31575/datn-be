@@ -22,6 +22,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { CreateAuthDto, SignInDto } from './dto/create-auth.dto';
 import { ForgotPasswordDto, ResetPasswordDto } from './dto/forgot-password.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 
 import { User } from '@/shared/decorator/user.decorator';
 
@@ -94,7 +95,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Resend verification email' })
   @ApiResponse({ status: 200, description: 'Email sent' })
   @ApiResponse({ status: 400, description: 'Email already verified' })
-  resendVerification(@Body() dto: ForgotPasswordDto) {
+  resendVerification(@Body() dto: ResendVerificationDto) {
     return this.authService.resendVerificationEmail(dto.email);
   }
 

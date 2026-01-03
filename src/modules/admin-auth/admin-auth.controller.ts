@@ -71,4 +71,3 @@ export class AdminAuthController {
     return await this.adminAuthService.createAdmin(createAdminDto);
   }
 }
-
