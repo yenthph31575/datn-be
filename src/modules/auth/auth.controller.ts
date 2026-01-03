@@ -19,9 +19,13 @@ import { GoogleAuthService } from './google-auth.service';
 import { AuthGuard } from './guards/auth.guard';
 
 import { CreateAuthDto, SignInDto } from './dto/create-auth.dto';
-import { ForgotPasswordDto, ResetPasswordDto } from './dto/forgot-password.dto';
+import {
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dto/forgot-password.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 import { User } from '@/shared/decorator/user.decorator';
 
@@ -68,6 +72,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200 })
   getProfile(@User() user: { sub: string }) {
     return this.authService.getProfile(user.sub);
   }
@@ -76,17 +81,9 @@ export class AuthController {
   @Post('verify-email')
   @HttpCode(200)
   @ApiOperation({ summary: 'Verify email address' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        token: { type: 'string', example: 'verify-token' },
-      },
-      required: ['token'],
-    },
-  })
-  verifyEmail(@Body('token') token: string) {
-    return this.authService.verifyEmail(token);
+  @ApiBody({ type: VerifyEmailDto })
+  verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.authService.verifyEmail(dto.token);
   }
 
   // ========================= RESEND VERIFICATION =========================
