@@ -35,6 +35,7 @@ export class AuthController {
 
   // ========================= GOOGLE AUTH =========================
   @Post('google')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Authenticate with Google' })
   @ApiResponse({ status: 200, description: 'Authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid Google token' })
@@ -73,9 +74,14 @@ export class AuthController {
   }
 
   // ========================= VERIFY EMAIL =========================
-  @Post('verify-email')
+  @Get('verify-email')
   @ApiOperation({ summary: 'Verify email address' })
-  @ApiQuery({ name: 'token', type: String, required: true })
+  @ApiQuery({
+    name: 'token',
+    type: String,
+    required: true,
+    description: 'Email verification token',
+  })
   @ApiResponse({ status: 200, description: 'Email verified' })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   verifyEmail(@Query('token') token: string) {
@@ -84,15 +90,17 @@ export class AuthController {
 
   // ========================= RESEND VERIFICATION =========================
   @Post('resend-verification')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Resend verification email' })
   @ApiResponse({ status: 200, description: 'Email sent' })
   @ApiResponse({ status: 400, description: 'Email already verified' })
-  resendVerification(@Body('email') email: string) {
-    return this.authService.resendVerificationEmail(email);
+  resendVerification(@Body() dto: ForgotPasswordDto) {
+    return this.authService.resendVerificationEmail(dto.email);
   }
 
   // ========================= FORGOT PASSWORD =========================
   @Post('forgot-password')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Reset email sent' })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
@@ -101,6 +109,7 @@ export class AuthController {
 
   // ========================= RESET PASSWORD =========================
   @Post('reset-password')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Reset password' })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
