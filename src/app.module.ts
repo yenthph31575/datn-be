@@ -27,6 +27,7 @@ import { ProductReviewModule } from './modules/product-review/product-review.mod
 import { SearchModule } from './modules/search/search.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { RecommendationModule } from './modules/recommendation/recommendation.module';
+import { ReturnRequestModule } from './modules/return-request/return-request.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { RecommendationModule } from './modules/recommendation/recommendation.mo
     SearchModule,
     DashboardModule,
     RecommendationModule,
+    ReturnRequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

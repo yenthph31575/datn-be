@@ -9,7 +9,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Order, OrderDocument } from '@/database/schemas/order.schema';
 import { CreateOrderDto } from '../dto/create-order.dto';
-import { OrderStatus, PAYMENT_METHOD, PaymentStatus, ShippingStatus } from '@/shared/enums';
+import {
+  OrderStatus,
+  PAYMENT_METHOD,
+  PaymentStatus,
+  ShippingStatus,
+  OrderItemStatus,
+  OrderReturnStatus,
+  orderType,
+} from '@/shared/enums';
 import { PaymentService } from './payment.service';
 import { Product, ProductDocument } from '@/database/schemas/product.schema';
 import { VoucherService } from '@/modules/voucher/services/voucher.service';
@@ -257,6 +265,87 @@ export class OrderService {
     }
   }
 
+  async createExchangeOrder(
+    originalOrderId: string,
+    userId: string,
+    items: { productId: string; variantId?: string; quantity: number }[],
+    shippingAddress: any,
+  ): Promise<Order> {
+    // Validate products and prepare order items
+    const orderItems = await Promise.all(
+      items.map(async (item) => {
+        const product = await this.productModel.findById(new Types.ObjectId(item.productId));
+        if (!product) {
+          throw new BadRequestException(`Product ${item.productId} not found`);
+        }
+
+        let variantPrice = 0; // Exchange items are free
+
+        // Stock check logic (similar to create order)
+        if (product.variants && product.variants.length > 0) {
+          if (item.variantId) {
+            const variant = product.variants.find((v) => v._id.toString() === item.variantId);
+            if (!variant) throw new BadRequestException('Variant not found');
+            if (variant.quantity < item.quantity) throw new BadRequestException(`Product ${product.name} out of stock`);
+          } else {
+            const total = product.variants.reduce((acc, v) => acc + (v.quantity || 0), 0);
+            if (total < item.quantity) throw new BadRequestException(`Product ${product.name} out of stock`);
+          }
+        }
+
+        return {
+          productId: new Types.ObjectId(item.productId),
+          variantId: item.variantId ? new Types.ObjectId(item.variantId) : undefined,
+          quantity: item.quantity,
+          price: 0, // Exchange items are free
+          attributes: {}, // Populate if needed
+          itemStatus: OrderItemStatus.NORMAL,
+        };
+      }),
+    );
+
+    // Generate unique order number
+    const timestamp = new Date().getTime().toString().slice(-8);
+    const random = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
+    const orderCode = `EXCH-${timestamp}${random}`;
+
+    const order = new this.orderModel({
+      userId: new Types.ObjectId(userId),
+      items: orderItems,
+      paymentMethod: PAYMENT_METHOD.CASH_ON_DELIVERY, // Shipping fee
+      orderCode,
+      shippingAddress,
+      paymentStatus: PaymentStatus.PENDING,
+      shippingStatus: ShippingStatus.PENDING,
+      totalAmount: 0, // Only shipping fee (handled by shipping integration usually, or assumed flat rate/COD)
+      discountAmount: 0,
+      returnStatus: OrderReturnStatus.NONE,
+      orderType: orderType.EXCHANGE,
+    });
+
+    const savedOrder = await order.save();
+
+    // Update Stock (Using same logic)
+    try {
+      for (const item of orderItems) {
+        if (item.productId && item.variantId) {
+          await this.productService.updateVariantStockOnOrder(
+            item.productId.toString(),
+            item.variantId.toString(),
+            item.quantity,
+            true,
+          );
+        }
+      }
+    } catch (e) {
+      this.logger.error('Failed to update stock for exchange order', e);
+    }
+
+    return savedOrder;
+  }
+
   async findUserOrders(
     userId: string,
     options: {
@@ -264,9 +353,10 @@ export class OrderService {
       limit?: number;
       paymentStatus?: string;
       shippingStatus?: string;
+      returnStatus?: string;
     },
   ): Promise<any> {
-    const { page = 1, limit = 10, paymentStatus, shippingStatus } = options;
+    const { page = 1, limit = 10, paymentStatus, shippingStatus, returnStatus } = options;
     const skip = (page - 1) * limit;
 
     const query: any = { userId: new Types.ObjectId(userId) };
@@ -277,6 +367,10 @@ export class OrderService {
 
     if (shippingStatus) {
       query.shippingStatus = shippingStatus;
+    }
+
+    if (returnStatus) {
+      query.returnStatus = returnStatus;
     }
 
     const [orders, total] = await Promise.all([

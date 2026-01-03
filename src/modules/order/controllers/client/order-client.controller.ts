@@ -4,7 +4,7 @@ import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { OrderService } from '../../services/order.service';
 import { CreateOrderDto } from '../../dto/create-order.dto';
 import { UserAddressService } from '@/modules/user/services/user-address.service';
-import { PaymentStatus, ShippingStatus } from '@/shared/enums';
+import { PaymentStatus, ShippingStatus, OrderReturnStatus } from '@/shared/enums';
 import { CancelOrderDto } from '../../dto/cancel-order.dto';
 
 @ApiTags('Orders')
@@ -50,18 +50,21 @@ export class OrderClientController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'paymentStatus', required: false, enum: Object.values(PaymentStatus) })
   @ApiQuery({ name: 'shippingStatus', required: false, enum: Object.values(ShippingStatus) })
+  @ApiQuery({ name: 'returnStatus', required: false, enum: Object.values(OrderReturnStatus) })
   findAll(
     @Request() req,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('paymentStatus') paymentStatus?: string,
     @Query('shippingStatus') shippingStatus?: string,
+    @Query('returnStatus') returnStatus?: string,
   ) {
     return this.orderService.findUserOrders(req.user.sub, {
       page,
       limit,
       paymentStatus,
       shippingStatus,
+      returnStatus,
     });
   }
 
