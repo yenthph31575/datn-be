@@ -5,6 +5,8 @@ import {
   Body,
   UseGuards,
   HttpCode,
+  Req,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -12,6 +14,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
@@ -22,27 +25,24 @@ import {
   ForgotPasswordDto,
   ResetPasswordDto,
 } from './dto/forgot-password.dto';
-import { GoogleAuthDto } from './dto/google-auth.dto';
-import { ResendVerificationDto } from './dto/resend-verification.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-
+import { GoogleAuthService } from './google-auth.service';
 import { User } from '@/shared/decorator/user.decorator';
-import { JwtPayload } from '@/shared/types/jwt-payload.type';
+
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly googleAuthService: GoogleAuthService) {}
 
   // ========================= GOOGLE AUTH =========================
   @Post('google')
   @HttpCode(200)
   @ApiOperation({ summary: 'Authenticate with Google' })
-  @ApiBody({ type: GoogleAuthDto })
   @ApiResponse({ status: 200, description: 'Authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid Google token' })
-  googleAuth(@Body() dto: GoogleAuthDto) {
-    return this.authService.googleLogin(dto.token);
+  async googleAuth(@Body('token') token: string) {
+     const googleData = await this.googleAuthService.verify(token);
+    return this.authService.handleGoogleAuth(googleData);
   }
 
   // ========================= SIGN UP =========================
@@ -73,29 +73,27 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200 })
-  getProfile(@User() user: JwtPayload) {
+  getProfile(@User() user: any) {
     return this.authService.getProfile(user.sub);
   }
 
   // ========================= VERIFY EMAIL =========================
-  @Post('verify-email')
-  @HttpCode(200)
+    @Post('verify-email')
   @ApiOperation({ summary: 'Verify email address' })
-  @ApiBody({ type: VerifyEmailDto })
-  @ApiResponse({ status: 200 })
-  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  verifyEmail(@Body() dto: VerifyEmailDto) {
-    return this.authService.verifyEmail(dto.token);
+  @ApiResponse({ status: 200, description: 'Email verified successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired verification token' })
+  @ApiQuery({ name: 'token', required: true, type: String })
+  verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
   }
 
-  // ========================= RESEND VERIFICATION =========================
   @Post('resend-verification')
-  @HttpCode(200)
   @ApiOperation({ summary: 'Resend verification email' })
-  @ApiBody({ type: ResendVerificationDto })
-  @ApiResponse({ status: 200 })
-  resendVerification(@Body() dto: ResendVerificationDto) {
-    return this.authService.resendVerificationEmail(dto.email);
+  @ApiResponse({ status: 200, description: 'Verification email sent successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Email is already verified' })
+  resendVerificationEmail(@Body('email') email: string) {
+    return this.authService.resendVerificationEmail(email);
   }
 
   // ========================= FORGOT PASSWORD =========================
