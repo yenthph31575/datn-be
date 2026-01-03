@@ -49,7 +49,12 @@ export class BannerAdminController {
     return this.bannerService.findOne(id);
   }
 
-  
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update banner' })
+  @AdminRolesAllowed(AdminRoles.ADMIN)
+  update(@Param('id') id: string, @Body() updateBannerDto: UpdateBannerDto) {
+    return this.bannerService.update(id, updateBannerDto);
+  }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete banner' })
