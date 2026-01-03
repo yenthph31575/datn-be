@@ -40,7 +40,6 @@ export class BannerAdminController {
       type,
       isActive,
     });
-    
   }
 
   @Get(':id')
@@ -56,10 +55,5 @@ export class BannerAdminController {
     return this.bannerService.update(id, updateBannerDto);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete banner' })
-  @AdminRolesAllowed(AdminRoles.ADMIN)
-  remove(@Param('id') id: string) {
-    return this.bannerService.remove(id);
-  }
+  
 }
