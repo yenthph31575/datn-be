@@ -1,11 +1,14 @@
 import { Controller, Get, Post, Body, UseGuards, HttpCode, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+
 import { AuthService } from './auth.service';
 import { GoogleAuthService } from './google-auth.service';
-import { CreateAuthDto, SignInDto } from './dto/create-auth.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from './guards/auth.guard';
-import { User } from '@/shared/decorator/user.decorator';
+
+import { CreateAuthDto, SignInDto } from './dto/create-auth.dto';
 import { ForgotPasswordDto, ResetPasswordDto } from './dto/forgot-password.dto';
+
+import { User } from '@/shared/decorator/user.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -15,96 +18,78 @@ export class AuthController {
     private readonly googleAuthService: GoogleAuthService,
   ) {}
 
+  // ========================= GOOGLE AUTH =========================
   @Post('google')
-  @ApiOperation({ summary: 'Authenticate with Google token' })
-  @ApiResponse({ status: 200, description: 'Successfully authenticated' })
-  @ApiResponse({ status: 401, description: 'Invalid Google token or email not verified' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        token: {
-          type: 'string',
-          description: 'Google ID token from frontend OAuth flow',
-          example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjFiZDY3...',
-        },
-      },
-      required: ['token'],
-    },
-  })
+  @ApiOperation({ summary: 'Authenticate with Google' })
+  @ApiResponse({ status: 200, description: 'Authenticated successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid Google token' })
   async googleAuth(@Body('token') token: string) {
     const googleData = await this.googleAuthService.verify(token);
     return this.authService.handleGoogleAuth(googleData);
   }
 
+  // ========================= SIGN UP =========================
   @Post('sign-up')
-  @ApiOperation({ summary: 'Sign up new user' })
-  @ApiResponse({ status: 201, description: 'User successfully created' })
+  @ApiOperation({ summary: 'Register new user' })
+  @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
-  signup(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.signup(createAuthDto);
+  signup(@Body() dto: CreateAuthDto) {
+    return this.authService.signup(dto);
   }
 
+  // ========================= SIGN IN =========================
   @Post('sign-in')
-  @ApiOperation({ summary: 'Sign in user' })
-  @ApiResponse({ status: 200, description: 'User successfully authenticated' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @HttpCode(200)
-  signin(@Body() signInDto: SignInDto) {
-    return this.authService.signin(signInDto);
+  @ApiOperation({ summary: 'Login user' })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  signin(@Body() dto: SignInDto) {
+    return this.authService.signin(dto);
   }
 
+  // ========================= PROFILE =========================
   @Get('me')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns current user profile',
-    schema: {
-      example: {
-        id: '65f2d4a12345678901234567',
-        email: 'user@example.com',
-        username: 'username',
-        avatar: 'https://example.com/avatar.jpg',
-      },
-    },
-  })
-  async getProfile(@User() user: any) {
+  @ApiResponse({ status: 200, description: 'User profile returned' })
+  getProfile(@User() user: { sub: string }) {
     return this.authService.getProfile(user.sub);
   }
 
+  // ========================= VERIFY EMAIL =========================
   @Post('verify-email')
   @ApiOperation({ summary: 'Verify email address' })
-  @ApiResponse({ status: 200, description: 'Email verified successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid or expired verification token' })
-  @ApiQuery({ name: 'token', required: true, type: String })
+  @ApiQuery({ name: 'token', type: String, required: true })
+  @ApiResponse({ status: 200, description: 'Email verified' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   verifyEmail(@Query('token') token: string) {
     return this.authService.verifyEmail(token);
   }
 
+  // ========================= RESEND VERIFICATION =========================
   @Post('resend-verification')
   @ApiOperation({ summary: 'Resend verification email' })
-  @ApiResponse({ status: 200, description: 'Verification email sent successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 400, description: 'Email is already verified' })
-  resendVerificationEmail(@Body('email') email: string) {
+  @ApiResponse({ status: 200, description: 'Email sent' })
+  @ApiResponse({ status: 400, description: 'Email already verified' })
+  resendVerification(@Body('email') email: string) {
     return this.authService.resendVerificationEmail(email);
   }
 
+  // ========================= FORGOT PASSWORD =========================
   @Post('forgot-password')
   @ApiOperation({ summary: 'Request password reset' })
-  @ApiResponse({ status: 200, description: 'Password reset instructions sent' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    return this.authService.forgotPassword(forgotPasswordDto.email);
+  @ApiResponse({ status: 200, description: 'Reset email sent' })
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto.email);
   }
 
+  // ========================= RESET PASSWORD =========================
   @Post('reset-password')
-  @ApiOperation({ summary: 'Reset password with token' })
-  @ApiResponse({ status: 200, description: 'Password reset successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid or expired reset token' })
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.newPassword);
+  @ApiOperation({ summary: 'Reset password' })
+  @ApiResponse({ status: 200, description: 'Password reset successful' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.token, dto.newPassword);
   }
 }

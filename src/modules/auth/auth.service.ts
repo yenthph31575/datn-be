@@ -73,21 +73,21 @@ export class AuthService {
     // Find user
     const user = await this.userModel.findOne({ email });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new NotFoundException('Tài khoản không tồn tại');
     }
 
     if (!user.isActive) {
-      throw new UnauthorizedException('Account is not active');
+      throw new BadRequestException('Tài khoản không hoạt động');
     }
 
     // Verify password
     const isPasswordValid = Hash.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new BadRequestException('Sai mật khẩu');
     }
 
     if (!user.isEmailVerified) {
-      throw new UnauthorizedException('Email not verified');
+      throw new BadRequestException('Email chưa được xác nhận');
     }
 
     // Generate tokens
