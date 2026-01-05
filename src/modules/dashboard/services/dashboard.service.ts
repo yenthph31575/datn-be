@@ -155,6 +155,7 @@ export class DashboardService {
           createdAt: { $gte: startDate, $lt: endDate },
           paymentStatus: PaymentStatus.COMPLETED,
           shippingStatus: ShippingStatus.DELIVERED,
+          isReturn: { $ne: true },
         },
       },
       {
@@ -179,6 +180,7 @@ export class DashboardService {
       createdAt: { $gte: startDate, $lt: endDate },
       paymentStatus: PaymentStatus.COMPLETED,
       shippingStatus: ShippingStatus.DELIVERED,
+      isReturn: { $ne: true },
     });
   }
 
@@ -224,6 +226,7 @@ export class DashboardService {
       {
         $match: {
           paymentStatus: PaymentStatus.COMPLETED,
+          isReturn: { $ne: true },
         },
       },
       {
@@ -247,6 +250,7 @@ export class DashboardService {
         $match: {
           createdAt: { $gte: startOfYear, $lt: endOfYear },
           paymentStatus: PaymentStatus.COMPLETED,
+          isReturn: { $ne: true },
         },
       },
       {
@@ -281,6 +285,7 @@ export class DashboardService {
       {
         $match: {
           createdAt: { $gte: startOfYear, $lt: endOfYear },
+          isReturn: { $ne: true },
         },
       },
       {
@@ -374,6 +379,7 @@ export class DashboardService {
     // Xây dựng pipeline để tính số lượng bán của từng sản phẩm
     const matchStage: any = {
       paymentStatus: PaymentStatus.COMPLETED,
+      isReturn: { $ne: true },
     };
 
     if (Object.keys(dateFilter).length > 0) {
@@ -462,6 +468,7 @@ export class DashboardService {
       createdAt: dateFilter,
       paymentStatus: PaymentStatus.COMPLETED,
       shippingStatus: ShippingStatus.DELIVERED,
+      isReturn: { $ne: true },
     };
 
     let groupByDate: any;
@@ -685,6 +692,7 @@ export class DashboardService {
     const matchStage: any = {
       paymentStatus: PaymentStatus.COMPLETED,
       shippingStatus: ShippingStatus.DELIVERED,
+      isReturn: { $ne: true },
     };
 
     if (Object.keys(dateFilter).length > 0) {

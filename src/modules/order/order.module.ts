@@ -4,6 +4,7 @@ import { Order, OrderSchema } from '@/database/schemas/order.schema';
 import { Product, ProductSchema } from '@/database/schemas/product.schema';
 import { Voucher, VoucherSchema } from '@/database/schemas/voucher.schema';
 import { ProductReview, ProductReviewSchema } from '@/database/schemas/product-review.schema';
+import { ReturnRequest, ReturnRequestSchema } from '@/database/schemas/return-request.schema';
 import { OrderService } from './services/order.service';
 import { OrderAdminService } from './services/order-admin.service';
 import { PaymentService } from './services/payment.service';
@@ -29,6 +30,7 @@ import { PaymentController } from './controllers/payment.controller';
       { name: Voucher.name, schema: VoucherSchema },
       { name: PaymentHistory.name, schema: PaymentHistorySchema },
       { name: ProductReview.name, schema: ProductReviewSchema },
+      { name: ReturnRequest.name, schema: ReturnRequestSchema },
       { name: User.name, schema: UserSchema },
       { name: Admin.name, schema: AdminSchema },
     ]),

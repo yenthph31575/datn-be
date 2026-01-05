@@ -251,23 +251,26 @@ export class OrderAdminService {
     const query = startDate || endDate ? { createdAt: dateQuery } : {};
 
     // Get total orders count
-    const totalOrders = await this.orderModel.countDocuments(query);
+    const totalOrders = await this.orderModel.countDocuments({
+      ...query,
+      isReturn: { $ne: true },
+    });
 
     // Get orders by payment status
     const ordersByPaymentStatus = await this.orderModel.aggregate([
-      { $match: query },
+      { $match: { ...query, isReturn: { $ne: true } } },
       { $group: { _id: '$paymentStatus', count: { $sum: 1 } } },
     ]);
 
     // Get orders by shipping status
     const ordersByShippingStatus = await this.orderModel.aggregate([
-      { $match: query },
+      { $match: { ...query, isReturn: { $ne: true } } },
       { $group: { _id: '$shippingStatus', count: { $sum: 1 } } },
     ]);
 
     // Get orders by payment method
     const ordersByPaymentMethod = await this.orderModel.aggregate([
-      { $match: query },
+      { $match: { ...query, isReturn: { $ne: true } } },
       { $group: { _id: '$paymentMethod', count: { $sum: 1 } } },
     ]);
 
@@ -277,6 +280,7 @@ export class OrderAdminService {
         $match: {
           ...query,
           paymentStatus: PaymentStatus.COMPLETED,
+          isReturn: { $ne: true },
         },
       },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } },

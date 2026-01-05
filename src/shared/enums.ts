@@ -306,3 +306,40 @@ export const ShippingStatus = {
   DELIVERED: 'DELIVERED',
   CANCELED: 'CANCELED',
 };
+
+export enum orderType {
+  NORMAL = 'NORMAL',
+  EXCHANGE = 'EXCHANGE',
+}
+
+export enum OrderItemStatus {
+  NORMAL = 'NORMAL',
+  EXCHANGE_REQUESTED = 'EXCHANGE_REQUESTED',
+  EXCHANGED = 'EXCHANGED',
+  RETURNED = 'RETURNED',
+}
+
+export enum OrderReturnStatus {
+  NONE = 'NONE',
+  EXCHANGE_REQUESTED = 'EXCHANGE_REQUESTED',
+  RETURN_REQUESTED = 'RETURN_REQUESTED',
+  EXCHANGED = 'EXCHANGED',
+  RETURNED = 'RETURNED',
+}
+
+export enum ReturnRequestType {
+  RETURN = 'RETURN',
+  EXCHANGE = 'EXCHANGE',
+}
+
+export enum ReturnRequestStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  COMPLETED = 'COMPLETED',
+}
+
+export enum ShippingFeePayer {
+  SHOP = 'SHOP',
+  CUSTOMER = 'CUSTOMER',
+}
