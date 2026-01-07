@@ -127,7 +127,7 @@ export class ProductAdminService {
       .populate('brandId', 'name slug');
 
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return product;
@@ -137,7 +137,7 @@ export class ProductAdminService {
     const updated = await this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return updated;
@@ -147,7 +147,7 @@ export class ProductAdminService {
     const deleted = await this.productModel.findByIdAndDelete(id);
 
     if (!deleted) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return deleted;
@@ -179,7 +179,7 @@ export class ProductAdminService {
     const updated = await this.productModel.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return updated;
@@ -189,7 +189,7 @@ export class ProductAdminService {
     const updated = await this.productModel.findByIdAndUpdate(id, { isFeatured }, { new: true });
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return updated;
@@ -199,7 +199,7 @@ export class ProductAdminService {
     const updated = await this.productModel.findByIdAndUpdate(id, { isActive }, { new: true });
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return updated;
@@ -209,7 +209,7 @@ export class ProductAdminService {
     const updated = await this.productModel.findByIdAndUpdate(id, { isOnSale }, { new: true });
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return updated;
@@ -219,7 +219,7 @@ export class ProductAdminService {
     const updated = await this.productModel.findByIdAndUpdate(id, { isNewArrival }, { new: true });
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return updated;
@@ -229,7 +229,7 @@ export class ProductAdminService {
     const updated = await this.productModel.findByIdAndUpdate(id, { isBestSeller }, { new: true });
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
 
     return updated;
