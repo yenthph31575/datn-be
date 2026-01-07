@@ -30,7 +30,7 @@ export class AuthService {
     // Check if user already exists
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('Email đã tồn tại');
     }
 
     // Generate verification token
@@ -63,7 +63,7 @@ export class AuthService {
         isEmailVerified: user.isEmailVerified,
       },
       ...tokens,
-      message: 'Registration successful. Please check your email to verify your account.',
+      message: 'Đăng ký thành công. Vui lòng kiểm tra email của bạn để xác minh tài khoản.',
     };
   }
 
