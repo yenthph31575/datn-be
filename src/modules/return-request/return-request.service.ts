@@ -72,11 +72,9 @@ export class ReturnRequestService {
 
     // If search is provided, find matching orders by order code
     if (search) {
-      const orders = await this.orderModel
-        .find({ orderCode: { $regex: search, $options: 'i' } })
-        .select('_id');
-      
-      const orderIds = orders.map(order => order._id);
+      const orders = await this.orderModel.find({ orderCode: { $regex: search, $options: 'i' } }).select('_id');
+
+      const orderIds = orders.map((order) => order._id);
       filter.orderId = { $in: orderIds };
     }
 

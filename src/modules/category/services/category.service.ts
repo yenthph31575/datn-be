@@ -50,7 +50,7 @@ export class CategoryService {
 
     const category = await this.categoryModel.findOne(query);
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('Không tìm thấy danh mục');
     }
     return category;
   }
@@ -58,7 +58,7 @@ export class CategoryService {
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
     const updated = await this.categoryModel.findByIdAndUpdate(id, updateCategoryDto, { new: true });
     if (!updated) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('Không tìm thấy danh mục');
     }
     return updated;
   }
@@ -66,7 +66,7 @@ export class CategoryService {
   async remove(id: string) {
     const deleted = await this.categoryModel.findByIdAndDelete(id);
     if (!deleted) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('Không tìm thấy danh mục');
     }
     return deleted;
   }
