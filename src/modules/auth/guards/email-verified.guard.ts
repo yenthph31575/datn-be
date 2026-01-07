@@ -25,7 +25,7 @@ export class EmailVerifiedGuard implements CanActivate {
     }
 
     if (!user.isEmailVerified) {
-      throw new ForbiddenException('Email verification required. Please verify your email address.');
+      throw new ForbiddenException('Yêu cầu xác minh email. Vui lòng xác nhận địa chỉ email của bạn.');
     }
 
     return true;
