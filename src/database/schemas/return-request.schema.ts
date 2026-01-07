@@ -71,7 +71,7 @@ export class ReturnRequest extends Document {
     bankAccount: string;
     bankAccountName: string;
   };
-  
+
   @Prop({ type: String })
   adminNote: string;
 }
