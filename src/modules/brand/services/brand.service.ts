@@ -65,7 +65,7 @@ export class BrandService {
 
     const brand = await this.brandModel.findOne(query);
     if (!brand) {
-      throw new NotFoundException('Brand not found');
+      throw new NotFoundException('Không tìm thấy thương hiệu');
     }
     return brand;
   }
@@ -73,7 +73,7 @@ export class BrandService {
   async update(id: string, updateBrandDto: UpdateBrandDto) {
     const updated = await this.brandModel.findByIdAndUpdate(id, updateBrandDto, { new: true });
     if (!updated) {
-      throw new NotFoundException('Brand not found');
+      throw new NotFoundException('Không tìm thấy thương hiệu');
     }
     return updated;
   }
@@ -81,7 +81,7 @@ export class BrandService {
   async remove(id: string) {
     const deleted = await this.brandModel.findByIdAndDelete(id);
     if (!deleted) {
-      throw new NotFoundException('Brand not found');
+      throw new NotFoundException('Không tìm thấy thương hiệu');
     }
     return deleted;
   }
@@ -93,7 +93,7 @@ export class BrandService {
   async toggleFeatured(id: string, isFeatured: boolean) {
     const updated = await this.brandModel.findByIdAndUpdate(id, { isFeatured }, { new: true });
     if (!updated) {
-      throw new NotFoundException('Brand not found');
+      throw new NotFoundException('Không tìm thấy thương hiệu');
     }
     return updated;
   }
@@ -101,7 +101,7 @@ export class BrandService {
   async toggleActive(id: string, isActive: boolean) {
     const updated = await this.brandModel.findByIdAndUpdate(id, { isActive }, { new: true });
     if (!updated) {
-      throw new NotFoundException('Brand not found');
+      throw new NotFoundException('Không tìm thấy thương hiệu');
     }
     return updated;
   }
