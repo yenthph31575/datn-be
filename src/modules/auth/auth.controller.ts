@@ -119,4 +119,4 @@ export class AuthController {
   resetPassword(@Body() dto: ResetPasswordDto): Promise<unknown> {
     return this.authService.resetPassword(dto.token, dto.newPassword);
   }
-}
+}  sửa ko thay đổi đê commit
