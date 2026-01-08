@@ -1,6 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { PaymentStatus, ShippingStatus, PAYMENT_METHOD } from '@/shared/enums';
+import {
+  PaymentStatus,
+  ShippingStatus,
+  PAYMENT_METHOD,
+  OrderItemStatus,
+  OrderReturnStatus,
+  orderType,
+} from '@/shared/enums';
 
 export type OrderDocument = Order & Document;
 
@@ -20,6 +27,13 @@ export class OrderItem {
 
   @Prop({ required: true })
   price: number;
+
+  @Prop({
+    type: String,
+    enum: OrderItemStatus,
+    default: OrderItemStatus.NORMAL,
+  })
+  itemStatus: OrderItemStatus;
 
   _id?: string;
 }
@@ -103,12 +117,38 @@ export class Order {
   @Prop({ type: [String], default: [] })
   shipperOfProof: string[];
 
+  //
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isReturn: boolean;
+
+  @Prop({
+    type: String,
+    enum: orderType,
+    default: orderType.NORMAL,
+  })
+  orderType: orderType;
+
   // Explicitly define timestamps
   createdAt: Date;
   updatedAt: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
+
+// Virtual populate for return request
+OrderSchema.virtual('returnRequest', {
+  ref: 'ReturnRequest',
+  localField: '_id',
+  foreignField: 'orderId',
+  justOne: true,
+});
+
+// Ensure virtuals are included in toJSON and toObject
+OrderSchema.set('toJSON', { virtuals: true });
+OrderSchema.set('toObject', { virtuals: true });
 
 // Generate unique order number
 OrderSchema.pre('save', function (next) {
