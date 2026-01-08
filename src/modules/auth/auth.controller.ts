@@ -32,9 +32,12 @@ import { JwtPayload } from '@/shared/types/jwt-payload.type';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService, // injected auth service
+  ) {}
 
   // ========================= GOOGLE AUTH =========================
+  // Login or register user via Google OAuth
   @Post('google')
   @HttpCode(200)
   @ApiOperation({ summary: 'Authenticate with Google' })
@@ -97,7 +100,9 @@ export class AuthController {
   resendVerification(
     @Body() dto: ResendVerificationDto,
   ): Promise<unknown> {
-    return this.authService.resendVerificationEmail(dto.email);
+    return this.authService.resendVerificationEmail(
+      dto.email,
+    );
   }
 
   // ========================= FORGOT PASSWORD =========================
@@ -116,7 +121,4 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset password' })
   @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: 200 })
-  resetPassword(@Body() dto: ResetPasswordDto): Promise<unknown> {
-    return this.authService.resetPassword(dto.token, dto.newPassword);
-  }
-}  sửa ko thay đổi đê commit
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<unknow
