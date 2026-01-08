@@ -41,7 +41,7 @@ export class AuthController {
   @ApiBody({ type: GoogleAuthDto })
   @ApiResponse({ status: 200, description: 'Authenticated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid Google token' })
-  googleAuth(@Body() dto: GoogleAuthDto) {
+  googleAuth(@Body() dto: GoogleAuthDto): Promise<unknown> {
     return this.authService.googleLogin(dto.token);
   }
 
@@ -52,7 +52,7 @@ export class AuthController {
   @ApiBody({ type: CreateAuthDto })
   @ApiResponse({ status: 201, description: 'User created' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
-  signup(@Body() dto: CreateAuthDto) {
+  signup(@Body() dto: CreateAuthDto): Promise<unknown> {
     return this.authService.signup(dto);
   }
 
@@ -63,7 +63,7 @@ export class AuthController {
   @ApiBody({ type: SignInDto })
   @ApiResponse({ status: 200 })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  signin(@Body() dto: SignInDto) {
+  signin(@Body() dto: SignInDto): Promise<unknown> {
     return this.authService.signin(dto);
   }
 
@@ -73,7 +73,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200 })
-  getProfile(@User() user: JwtPayload) {
+  getProfile(@User() user: JwtPayload): Promise<unknown> {
     return this.authService.getProfile(user.sub);
   }
 
@@ -84,7 +84,7 @@ export class AuthController {
   @ApiBody({ type: VerifyEmailDto })
   @ApiResponse({ status: 200 })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  verifyEmail(@Body() dto: VerifyEmailDto) {
+  verifyEmail(@Body() dto: VerifyEmailDto): Promise<unknown> {
     return this.authService.verifyEmail(dto.token);
   }
 
@@ -94,7 +94,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Resend verification email' })
   @ApiBody({ type: ResendVerificationDto })
   @ApiResponse({ status: 200 })
-  resendVerification(@Body() dto: ResendVerificationDto) {
+  resendVerification(
+    @Body() dto: ResendVerificationDto,
+  ): Promise<unknown> {
     return this.authService.resendVerificationEmail(dto.email);
   }
 
@@ -104,7 +106,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset' })
   @ApiBody({ type: ForgotPasswordDto })
   @ApiResponse({ status: 200 })
-  forgotPassword(@Body() dto: ForgotPasswordDto) {
+  forgotPassword(@Body() dto: ForgotPasswordDto): Promise<unknown> {
     return this.authService.forgotPassword(dto.email);
   }
 
@@ -114,7 +116,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset password' })
   @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: 200 })
-  resetPassword(@Body() dto: ResetPasswordDto) {
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<unknown> {
     return this.authService.resetPassword(dto.token, dto.newPassword);
   }
 }
