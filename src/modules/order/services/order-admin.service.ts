@@ -65,7 +65,13 @@ export class OrderAdminService {
     }
 
     const [orders, total] = await Promise.all([
-      this.orderModel.find(query).populate('userId', 'email username').sort({ createdAt: -1 }).skip(skip).limit(limit),
+      this.orderModel
+        .find(query)
+        .populate('userId', 'email username')
+        .populate('returnRequest')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
       this.orderModel.countDocuments(query),
     ]);
 
@@ -133,7 +139,7 @@ export class OrderAdminService {
   }
 
   async findOne(id: string): Promise<Order> {
-    const order = await this.orderModel.findById(id).populate('userId', 'email username');
+    const order = await this.orderModel.findById(id).populate('userId', 'email username').populate('returnRequest');
 
     if (!order) {
       throw new NotFoundException('Order not found');
